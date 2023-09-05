@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.1.0.0\build\native\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.props" Condition="Exists('..\packages\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.1.0.0\build\native\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -79,8 +80,19 @@
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.2.targets" />
+    <Import Project="..\packages\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.1.0.0\build\native\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.targets" Condition="Exists('..\packages\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.1.0.0\build\native\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Ten projekt zawiera odwołania do pakietów NuGet, których nie ma na tym komputerze. Użyj przywracania pakietów NuGet, aby je pobrać. Aby uzyskać więcej informacji, zobacz http://go.microsoft.com/fwlink/?LinkID=322105. Brakujący plik: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.1.0.0\build\native\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.1.0.0\build\native\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.props'))" />
+    <Error Condition="!Exists('..\packages\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.1.0.0\build\native\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.1.0.0\build\native\vcpkg.C.Users.danie000.Desktop.PGPU.VPKG.vcpkg.targets'))" />
+  </Target>
 </Project>

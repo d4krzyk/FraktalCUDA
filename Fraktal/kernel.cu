@@ -3,8 +3,48 @@
 #include <complex>
 #include <fstream>
 #include <cuda_runtime.h>
-#include <GLUT/glut.h>
+//#include <GLFW/glfw3.h>
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 #include <cuda_gl_interop.h>
+
+#define WIDTH 800
+#define HEIGHT 800
+
+
+GLuint texture; // ID tekstury OpenGL
+cudaGraphicsResource* cudaTextureResource; // CUDA resource dla tekstury
+
+
+// Funkcja inicjalizująca OpenGL
+void initOpenGL(int argc, char** argv) {
+    // Inicjalizacja GLUT
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(WIDTH, HEIGHT); // Ustaw rozmiar okna
+    glutInitWindowPosition(0, 0);
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+    /*glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-2, 2, 2, -2, 1, -1);*/
+    // Stwórz okno GLUT
+    glutCreateWindow("CUDA-Mandelbrot");
+
+    // Inicjalizacja GLEW dla obsługi rozszerzeń OpenGL
+    glewInit();
+
+    // Utwórz teksturę OpenGL
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Zarejestruj teksturę w CUDA
+    cudaGraphicsGLRegisterImage(&cudaTextureResource, texture, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsWriteDiscard);
+}
+
+
 __global__
 void mandelbrotGPU(float* output, int width, int height, float xmin, float xmax, float ymin, float ymax, int max_iter, float chaos_c) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -96,10 +136,25 @@ __global__ void processImage(float* input, uchar4* output, int width, int height
     }
 }
 
+void Display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glBegin(GL_POINTS);
+
+    
+
+    glEnd();
+    glutSwapBuffers();
+}
 
 
 
-int main() {
+
+
+int main(int argc, char** argv) {
+
+    // Inicjalizacja OpenGL
+    initOpenGL(argc, argv);
+
 
     const int width = 1600;
     const int height = 1600;
@@ -173,6 +228,12 @@ int main() {
 
 
     cudaDeviceSynchronize();
+
+
+    glutDisplayFunc(Display);
+    glutMainLoop();
+
+
 
     // Zapisz tablicę pixels do pliku
     saveArrayToFile("output_mandela_arrayGPU.bin", outputGPU, width * height);
