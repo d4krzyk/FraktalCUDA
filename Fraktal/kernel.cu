@@ -19,8 +19,8 @@ void mandelbrotGPU(float* output, int width, int height, float xmin, float xmax,
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (x < width && y < height) {
-        float real = xmin + (xmax - xmin) * x / width;
-        float imag = ymin + (ymax - ymin) * y / height;
+        float real = xmin + (xmax - xmin) * x / (width - 1);
+        float imag = ymin + (ymax - ymin) * y / (height - 1);
 
         float2 c = make_float2(real * chaos_cr, imag * chaos_ci);
         float2 z = c;
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
     cudaEventCreate(&stopGPU);
 
     cudaEventRecord(startGPU);
-    mandelbrotGPU < <<gridSize, blockSize>> > (outputGPU, width, height, xmin, xmax, ymin, ymax, max_iter, var_cr, var_ci);
+    mandelbrotGPU <<<gridSize, blockSize>>>(outputGPU, width, height, xmin, xmax, ymin, ymax, max_iter, var_cr, var_ci);
     // Przekonwertuj dane na obraz na CPU
     float* gpuImage = new float[width * height];
     cudaMemcpy(gpuImage, outputGPU, width * height * sizeof(float), cudaMemcpyDeviceToHost);
